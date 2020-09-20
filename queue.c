@@ -193,32 +193,42 @@ void merge_sort(list_ele_t **q, int size)
     if (size < 2) {
         return;
     }
-    list_ele_t **a = q;
-    list_ele_t **b = q;
+    list_ele_t *sub_q1 = *q;
+    list_ele_t *sub_q2 = *q;
+    list_ele_t **tmp = q;
     int size2 = size / 2;
     int size1 = size - size2;
-    merge_sort(a, size1);
     for (int i = 0; i < size1; i++) {
-        b = &(*b)->next;
+        tmp = &sub_q2->next;
+        sub_q2 = sub_q2->next;
     }
-    merge_sort(b, size2);
-    int acount = 0;
-    int bcount = 0;
-    while (acount < size1 && bcount < size2) {
-        int cmp = strcmp((*a)->value, (*b)->value);
+    *tmp = NULL;
+    tmp = q;
+    *q = NULL;
+    merge_sort(&sub_q1, size1);
+    merge_sort(&sub_q2, size2);
+    while (sub_q1 && sub_q2) {
+        int cmp = strcmp(sub_q1->value, sub_q2->value);
         if (cmp >= 0) {
-            list_ele_t *tmp = (*b)->next;
-            (*b)->next = *a;
-            *a = *b;
-            *b = tmp;
-            bcount++;
+            *tmp = sub_q2;
+            sub_q2 = sub_q2->next;
+            tmp = &(*tmp)->next;
             if (cmp == 0) {
-                a = &(*a)->next;
-                acount++;
+                *tmp = sub_q1;
+                sub_q1 = sub_q1->next;
+                tmp = &(*tmp)->next;
             }
+        } else {
+            *tmp = sub_q1;
+            sub_q1 = sub_q1->next;
+            tmp = &(*tmp)->next;
         }
-        a = &(*a)->next;
-        acount++;
+        *tmp = NULL;
+    }
+    if (sub_q1) {
+        *tmp = sub_q1;
+    } else {
+        *tmp = sub_q2;
     }
 }
 void q_sort(queue_t *q)
