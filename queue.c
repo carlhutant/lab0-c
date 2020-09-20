@@ -63,6 +63,7 @@ bool q_insert_head(queue_t *q, char *s)
         return false;
     }
     strncpy(newh->value, s, strlen(s));
+    newh->value[strlen(s)] = '\0';
     newh->next = q->head;
     q->head = newh;
     if (q->tail == NULL)
@@ -95,6 +96,7 @@ bool q_insert_tail(queue_t *q, char *s)
         return false;
     }
     strncpy(newh->value, s, strlen(s));
+    newh->value[strlen(s)] = '\0';
     newh->next = NULL;
     q->head = newh;
     if (q->head == NULL)
@@ -123,11 +125,14 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
     if (q->tail == node_free)
         q->tail = q->tail->next;
     if (sp) {
-        size_t l = strlen(node_free->value);
-        strncpy(sp, node_free->value, bufsize - 1);
-        if (l > (bufsize - 1)) {
-            sp[bufsize - 1] = 0;
+        size_t l;
+        if (bufsize > strlen(node_free->value)) {
+            l = strlen(node_free->value);
+        } else {
+            l = bufsize - 1;
         }
+        strncpy(sp, node_free->value, l);
+        sp[l + 1] = 0;
     }
     free(node_free->value);
     free(node_free);
@@ -183,8 +188,6 @@ void q_reverse(queue_t *q)
  */
 void q_sort(queue_t *q)
 {
-    /* TODO: You need to write the code for this function */
-    /* TODO: Remove the above comment when you are about to implement. */
     if (q == NULL || q->size < 2) {
         return;
     }
