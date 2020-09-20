@@ -188,34 +188,43 @@ void q_reverse(queue_t *q)
  * No effect if q is NULL or empty. In addition, if q has only one
  * element, do nothing.
  */
-void q_sort(queue_t *q)
+void merge_sort(list_ele_t **q, int size)
 {
-    if (q == NULL || q->size < 2) {
+    if (size < 2) {
         return;
     }
-    list_ele_t **a = &q->head;
-    list_ele_t **b = &q->head;
-    queue_t *q2 = q_new();
-    q2->size = (q->size) / 2;
-    q->size -= q2->size;
-    for (int i = 0; i < q->size; i++) {
+    list_ele_t **a = q;
+    list_ele_t **b = q;
+    int size2 = size / 2;
+    int size1 = size - size2;
+    merge_sort(a, size1);
+    for (int i = 0; i < size1; i++) {
         b = &(*b)->next;
     }
-    q2->head = *b;
-    q_sort(q);
-    q_sort(q2);
-    while (*a != *b && *b != NULL) {
+    merge_sort(b, size2);
+    int acount = 0;
+    int bcount = 0;
+    while (acount < size1 && bcount < size2) {
         int cmp = strcmp((*a)->value, (*b)->value);
         if (cmp >= 0) {
             list_ele_t *tmp = (*b)->next;
             (*b)->next = *a;
             *a = *b;
             *b = tmp;
+            bcount++;
             if (cmp == 0) {
                 a = &(*a)->next;
+                acount++;
             }
         }
         a = &(*a)->next;
+        acount++;
     }
-    return;
+}
+void q_sort(queue_t *q)
+{
+    if (q == NULL || q->size < 2) {
+        return;
+    }
+    merge_sort(&q->head, q->size);
 }
