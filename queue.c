@@ -188,5 +188,29 @@ void q_sort(queue_t *q)
     if (q == NULL || q->size < 2) {
         return;
     }
+    list_ele_t **a = &q->head;
+    list_ele_t **b = &q->head;
+    queue_t *q2 = q_new();
+    q2->size = (q->size) / 2;
+    q->size -= q2->size;
+    for (int i = 0; i < q->size; i++) {
+        b = &(*b)->next;
+    }
+    q2->head = *b;
+    q_sort(q);
+    q_sort(q2);
+    while (*a != *b && *b != NULL) {
+        int cmp = strcmp((*a)->value, (*b)->value);
+        if (cmp >= 0) {
+            list_ele_t *tmp = (*b)->next;
+            (*b)->next = *a;
+            *a = *b;
+            *b = tmp;
+            if (cmp == 0) {
+                a = &(*a)->next;
+            }
+        }
+        a = &(*a)->next;
+    }
     return;
 }
