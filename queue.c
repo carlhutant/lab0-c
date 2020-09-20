@@ -98,11 +98,14 @@ bool q_insert_tail(queue_t *q, char *s)
     strncpy(newh->value, s, strlen(s));
     newh->value[strlen(s)] = '\0';
     newh->next = NULL;
-    q->head = newh;
+    if (q->tail) {
+        q->tail->next = newh;
+    }
     if (q->head == NULL)
         q->head = newh;
+    q->tail = newh;
     (q->size)++;
-    return false;
+    return true;
 }
 
 /*
@@ -132,7 +135,7 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
             l = bufsize - 1;
         }
         strncpy(sp, node_free->value, l);
-        sp[l + 1] = 0;
+        sp[l] = 0;
     }
     free(node_free->value);
     free(node_free);
@@ -170,8 +173,7 @@ void q_reverse(queue_t *q)
     }
     list_ele_t **node = &(q->head);
     list_ele_t *cursor = NULL;
-    q->head = q->tail;
-    q->tail = *node;
+    q->tail = q->head;
     while (*node) {
         list_ele_t *next = (*node)->next;
         (*node)->next = cursor;
